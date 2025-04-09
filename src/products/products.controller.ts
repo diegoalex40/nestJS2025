@@ -1,10 +1,31 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Put, Query, Res } from '@nestjs/common';
-import { response } from 'express';
-import { get } from 'http';
-import { isBooleanObject } from 'util/types';
+import {ProductsService} from '../products/products.service';
+import { Product } from './interface/product/product.interface';
+
+
 
 @Controller('products')
 export class ProductsController {
+    constructor(private readonly productsService: ProductsService) {}
+
+    @Get()
+    getAllProducts(): Product[] {
+        return this.productsService.getAll();
+    }
+    
+    @Post()
+    @HttpCode(201)
+    createProducts(
+        @Body('name') name: string,
+        @Body('description') description: string
+    ) {
+        this.productsService.insert({
+            id: this.productsService.getAll().length,
+            name,
+            description
+        });
+    }
+
     @Get('inventario')
     getHelloInProducts(): string{
         return "Estamos en productos con una funcionalidad nueva!!"
