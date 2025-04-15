@@ -1,8 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Put, Query, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Put, Res } from '@nestjs/common';
 import {ProductsService} from '../products/products.service';
 import { Product } from './interface/product/product.interface';
-
-
 
 @Controller('products')
 export class ProductsController {
@@ -83,7 +81,7 @@ export class ProductsController {
     //DECORADOR RES
 
     @Get(':id')
-    find(@Res() response, @Param('id') id:number) {
+    find(@Res() response, @Param('id', ParseIntPipe) id:number) {
         if(id<100) {
             return response.status(HttpStatus.OK).send(`Pagina del producto: ${id}`);
         } else {
@@ -113,5 +111,7 @@ export class ProductsController {
     delete(@Param('id') id: number) {
         return `Hemos borrado el producto ${id}`;
     }
+
+
 
 }
