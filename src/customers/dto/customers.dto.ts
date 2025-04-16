@@ -2,7 +2,6 @@ import { Type } from "class-transformer";
 import { IsDate, IsInt, IsString, Matches } from "class-validator";
 
 export class CustomersDto {
-        
     @IsString()
     @Matches(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/, {message : 'El nombre solo debe contener letras y espacios'})
     name: string;
@@ -14,4 +13,7 @@ export class CustomersDto {
     @Type(() => Date)
     @IsDate({ message: 'La fecha de nacimiento debe tener el formato AAAA-MM-DD' })
     birthday: Date;
+
+    @IsString({message: 'Colocar su lugar de residencia completo, incluyendo intersecciones'})
+    recidence: string;
 }

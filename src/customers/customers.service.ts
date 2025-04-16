@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import {Customer} from './interface/customers/customer.interface'
+import {Customer} from './interface/customers/customer.interface';
+import { CustumerPatchDto } from './dto/custumer-patch.dto';
+
 
 @Injectable()
 export class CustomersService {
@@ -9,18 +11,21 @@ export class CustomersService {
             name: 'Diego Yanez',
             age: 31,
             birthday: new Date('1999-02-06'),
+            recidence: 'Centro Historico Quito',
         },
         {
             id: 1,
             name: 'Miguel Sosa',
             age: 27,
             birthday: new Date('1998-02-06'),
+            recidence: 'Centro Historico Quito',
         },
         {
             id: 2,
             name: 'Cristian Redin',
             age: 26,
             birthday: new Date('1997-02-06'),
+            recidence: 'Centro Historico Quito',
         },
     ]
 
@@ -43,6 +48,7 @@ export class CustomersService {
                 name: body.name,
                 age: body.age,
                 birthday: body.birthday,
+                recidence: body.recidence,
             }
         ];
     }
@@ -59,12 +65,30 @@ export class CustomersService {
             name: body.name,
             age: body.age,
             birthday: body.birthday,
+            recidence: body.recidence
         }
         this.customers = this.customers.map( (item: Customer) => {
             console.log(item, id, item.id == id);
             return item.id == id? customer : item;
         }
         )
+    }
+
+    //PATCH EN EL SERVICIO PARA USO CON DTO
+
+    patch(id: number, body: CustumerPatchDto) {
+        let previusCustomer = this.getCustomersById(id);
+        if(!previusCustomer) throw new Error('Customer No existe');
+
+        let customer = {
+            ...previusCustomer,
+            ...body,
+            id: previusCustomer.id
+        }
+        this.customers = this.customers.map((item) => {
+            return item.id == id ? customer : item;
+        });
+        return customer;
     }
 
     //DELETE DENTRO DEL CRUD

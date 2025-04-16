@@ -1,7 +1,8 @@
-import { Controller, Query, Get, ParseIntPipe, Param, Post, HttpCode, HttpStatus, Body, Put, Delete } from '@nestjs/common';
+import { Controller, Query, Get, ParseIntPipe, Param, Post, HttpCode, HttpStatus, Body, Put, Delete, Patch, UsePipes, ValidationPipe } from '@nestjs/common';
 import {Customer} from './interface/customers/customer.interface';
 import { CustomersService } from './customers.service';
-import { CustomersDto } from './dto/customers.dto/customers.dto';
+import { CustomersDto } from './dto/customers.dto';
+import { CustumerPatchDto } from './dto/custumer-patch.dto';
 
 @Controller('customers')
 export class CustomersController {
@@ -49,6 +50,15 @@ export class CustomersController {
         @Body() body,
     ) {
         return this.custumerService.update(id, body);
+    }
+
+    //PATCH PARA USO CON DTO PARCIAL
+    @Patch(':id')
+    async patch(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() body: CustumerPatchDto,
+    ){
+        return this.custumerService.patch(id, body);
     }
 
     @Delete(':id')
