@@ -6,19 +6,22 @@ import { Product } from './interface/product/product.interface';
 export class ProductsController {
     constructor(private readonly productsService: ProductsService) {}
 
+    //Traer datos desde desde la BDD
     @Get()
-    getAllProducts(): Product[] {
-        return this.productsService.getAll();
+    async getAllProducts(): Promise<Product>{
+        return await this.productsService.getAll();
+    }
     }
     
+    //
     @Post()
     @HttpCode(201)
-    createProducts(
+    async createProducts(
         @Body('name') name: string,
         @Body('description') description: string
     ) {
-        this.productsService.insert({
-            id: this.productsService.getAll().length,
+        await this.productsService.insert({
+            id: (await this.productsService.getAll()).length,
             name,
             description
         });
@@ -50,10 +53,10 @@ export class ProductsController {
 
 //RECIBIR VARIOS PARAMETROS EN LA URL TIPADOS Y DESAGREGADOS
 
-    @Get(':id/:size')
-    findWithSize( @Param('id') id: number, @Param('size') size: string) {
-        return `productos con id: ${id} ----- size: ${size}`;
-    }
+//    @Get(':id/:size')
+//    findWithSize( @Param('id') id: number, @Param('size') size: string) {
+//        return `productos con id: ${id} ----- size: ${size}`;
+//    }
 
 //USO DE POST
 
@@ -81,8 +84,9 @@ export class ProductsController {
     //DECORADOR RES
 
     @Get(':id')
-    find(@Res() response, @Param('id', ParseIntPipe) id:number) {
-        if(id<100) {
+    async find(@Res() response, @Param('id', ParseIntPipe) id:number) { // También puede ser asíncrono si el servicio getId lo es
+        const product = await this.productsService.getId(id);
+        if(product) {
             return response.status(HttpStatus.OK).send(`Pagina del producto: ${id}`);
         } else {
             return response.status(HttpStatus.NOT_FOUND).send(`Producto inexistente`);
@@ -92,15 +96,17 @@ export class ProductsController {
     //DECORADOR PUT
 
     @Put(':id')
-    update(@Param('id') id: number, @Body() body) {
-        return `Estas haciendo una operacion de actualizacion del recurso ${id} con ${body.name} 
-        y ${body.description}`;
+    async update(@Param('id') id: number, @Body() body) { // También puede ser asíncrono
+        await this.productsService.update(id, body);
+        return `Estas haciendo una operacion de actualizacion del recurso ${id} con ${body.name}
+          y ${body.description}`;
     }
 
     //DECORADOR PATCH
 
     @Patch(':id')
-    partialUpdate(@Param('id') id: number, @Body() body) {
+    async partialUpdate(@Param('id') id: number, @Body() body) { // También puede ser asíncrono
+        await this.productsService.partialUpdate(id, body);
         return `Actualización parcial del itam ${id}`;
     }
 
@@ -108,10 +114,10 @@ export class ProductsController {
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    delete(@Param('id') id: number) {
+    async delete(@Param('id') id: number) { // También debe ser asíncrono
+        await this.productsService.delete(id);
         return `Hemos borrado el producto ${id}`;
     }
-
 
 
 }

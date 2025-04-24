@@ -1,76 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from './interface/product/product.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductEntity } from './products.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProductsService {
-    private products: Product[] = [
-        {
-            id: 0,
-            name: 'Vela aromática',
-            description: 'Esta vela olor a rosas',
-          },
-          {
-            id: 1,
-            name: 'Marco de fotos pequeño',
-            description: 'Marco ideal para fotos 10x15',
-          },
-          {
-            id: 2,
-            name: 'Marco de fotos mediano',
-            description: 'Marco ideal para fotos 20x25',
-          },
-          {
-            id: 3,
-            name: 'Marco de fotos grande',
-            description: 'Marco ideal para fotos 40x30',
-          },
-          {
-            id: 4,
-            name: 'Marco de fotos grande',
-            description: 'Marco ideal para fotos 40x30',
-          }
-    ];
+    constructor(
+      @InjectRepository(ProductEntity)
+      private productsRepository: Repository<ProductEntity>,
+    ){}
+    private products: Product[]
 
-    getAll(): Product[] {
-        return this.products;
+    async getAll(): Promise<Product[]> {
+        const productsEntity: ProductEntity[] = await this.productsRepository.find();
+        return productsEntity.map(({ id, name, description }) => ({ id, name, description }));
     }
 
     //READ
-    getId(id:number) {
-        return this.products.find( (item: Product) => item.id == id);
-    }
+    async getId(id: number): Promise<Product | undefined> {
+      const productEntity = await this.productsRepository.findOne({ where: { id } });
+      if (productEntity) {
+          return { id: productEntity.id, name: productEntity.name, description: productEntity.description };
+      }
+      return undefined;
+  }
 
     //CREATE
-    insert(body: any) {
-        this.products = [
-            ...this.products,
-            {
-                id: this.lastId() + 1,
-                name: body.name,
-                description: body.descripcion,
-            }
-        ]
+    async insert(body: any): Promise<ProductEntity> { // Recibe un objeto genérico y guarda una ProductEntity
+      const productEntity = this.productsRepository.create(body);
+      return this.productsRepository.save(productEntity);
     }
- 
+
     //UPDATE
-    update(id: number, body: any) {
-        let product: Product = {
-          id,
-          name: body.name,
-          description: body.description,
-        }
-        this.products = this.products.map( (item: Product) => {
-          console.log(item, id, item.id == id);
-          return item.id == id ? product : item;
-        });
+    async update(id: number, body: any): Promise<void>{
+      await this.productsRepository.update(id, body);
     }
 
     //DELETE
-    delete(id: number) {
-        this.products = this.products.filter( (item: Product) => item.id != id );
-    }
-    
-    private lastId(): number {
-        return this.products[this.products.length -1].id;
+    async delete(id: number): Promise<void> {
+      await this.productsRepository.delete(id);
     }
 }

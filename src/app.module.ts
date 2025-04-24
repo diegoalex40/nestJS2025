@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsController } from './products/products.controller';
 import { CustomersController } from './customers/customers.controller';
-import { UsersController } from './controllers/users/users.controller';
 import { ProductsService } from './products/products.service';
 import { CustomersService } from './customers/customers.service';
 import { ProductsModule } from './products/products.module';
@@ -27,7 +26,7 @@ import { UsersModule } from './users/users.module';
     logging: true
   }), UsersModule
 ],
-  controllers: [AppController, ProductsController, CustomersController, UsersController],
+  controllers: [AppController, ProductsController, CustomersController],
   providers: [AppService, ProductsService, CustomersService],
 })
 export class AppModule {}

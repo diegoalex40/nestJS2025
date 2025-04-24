@@ -22,7 +22,14 @@ export class UsersService {
         return user;
     }
 
-    create(user: User): Promise<User> {
-        return this.userRepository.save(user);
+    async create(user: User): Promise<User> {
+        try{
+            const result = await this.userRepository.save(user);
+            console.log('Usuario guardado', result)
+            return result
+        } catch (error) {
+            console.error('Error al guardad Usuario', error)
+            throw error
+        }
     }
 }

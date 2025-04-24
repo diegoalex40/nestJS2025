@@ -1,6 +1,7 @@
 import { Body, Controller, Param, ParseIntPipe, Get, Post } from '@nestjs/common';
 import {User} from './users.entity';
 import {UsersService} from './users.service';
+import {UserDto} from './user.dto'
 
 @Controller('users')
 export class UsersController {
@@ -17,7 +18,15 @@ export class UsersController {
     }
 
     @Post()
-    create(@Body() user : User): Promise<User> {
+    create(@Body() userDto: UserDto): Promise<User> {
+        const user = new User();
+        user.name = userDto.name;
+        user.last_name = userDto.last_name;
+        user.email = userDto.email;
+        user.birthday = new Date(userDto.birthday);
+        user.identification = userDto.identification;
         return this.userService.create(user);
     }
+
+    
 }
